@@ -4,11 +4,14 @@ using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 
 namespace RGInstaller
 {
     class Program
     {
+        static readonly string SourceUri = "https://radioactive-gaming.github.io/data/minecraft";
+
         static void Main(string[] args)
         {
             try
@@ -17,7 +20,7 @@ namespace RGInstaller
                 {
                     // Get the modpack info.
                     Console.WriteLine("Fetching modpack info...");
-                    byte[] bytes = client.DownloadData("https://radioactive-gaming.github.io/minecraft/modpack.json");
+                    byte[] bytes = client.DownloadData(Path.Combine(SourceUri, "modpack.json"));
                     Modpack modpackInfo = JsonConvert.DeserializeObject<Modpack>(Encoding.UTF8.GetString(bytes));
 
                     // Check if the modpack was read successfully.
@@ -61,9 +64,12 @@ namespace RGInstaller
                     }
 
                     if (forgeFound)
-                        Console.WriteLine("The correct version of forge is installed.");
+                        Console.WriteLine("Forge found.");
                     else
-                        throw new Exception(string.Format("Please instal "));
+                    {
+                        Console.WriteLine("Please instal {0}", modpackInfo.ForgeVersion);
+                        Process.Start(modpackInfo.ForgeInstaller);
+                    }
 
                     // Download the mods
                     foreach (string modSource in modpackInfo.ModSources)
@@ -88,7 +94,13 @@ namespace RGInstaller
             catch (WebException e)
             {
                 Console.WriteLine("Error: {0}", e.Message);
-                Console.WriteLine(" - Response: {0}", e.Response?.ToString() ?? "No Response");
+
+                if (e.Response != null)
+                    Console.WriteLine(" - Response Uri: {0}", e.Response.ResponseUri);
+
+                if (e.InnerException != null)
+                    Console.WriteLine(" - Inner Exception: {0}", e.InnerException.Message);
+
                 Console.WriteLine("Please post a screenshot of this log to the RG discord for help");
             }
             catch (Exception e)
@@ -107,6 +119,7 @@ namespace RGInstaller
         {
             public string ForgeVersion { get; set; }
             public string[] ModSources { get; set; }
+            public string ForgeInstaller { get; set; }
         }
     }
 }
