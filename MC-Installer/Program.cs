@@ -17,7 +17,7 @@ namespace RGInstaller
                 {
                     // Get the modpack info.
                     Console.WriteLine("Fetching modpack info...");
-                    byte[] bytes = client.DownloadData("http://localhost:8080/modpack.json");
+                    byte[] bytes = client.DownloadData("https://radioactive-gaming.github.io/minecraft/modpack.json");
                     Modpack modpackInfo = JsonConvert.DeserializeObject<Modpack>(Encoding.UTF8.GetString(bytes));
 
                     // Check if the modpack was read successfully.
