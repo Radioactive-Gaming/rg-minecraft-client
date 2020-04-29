@@ -10,7 +10,7 @@ namespace RGInstaller
 {
     class Program
     {
-        static readonly string SourceUri = "https://radioactive-gaming.github.io/data/minecraft";
+        static readonly string SourceUri = "http://radzgaming.com/data/minecraft";
 
         static void Main(string[] args)
         {
@@ -19,7 +19,7 @@ namespace RGInstaller
                 using (WebClient client = new WebClient())
                 {
                     // Get the modpack info.
-                    Console.WriteLine("Fetching modpack info...");
+                    Console.WriteLine("Fetching modpack info...\n");
                     byte[] bytes = client.DownloadData(Path.Combine(SourceUri, "modpack.json"));
                     Modpack modpackInfo = JsonConvert.DeserializeObject<Modpack>(Encoding.UTF8.GetString(bytes));
 
@@ -34,7 +34,7 @@ namespace RGInstaller
 
                     // Ensure the minecraft directory exists.
                     if (Directory.Exists(minecraftDirectory))
-                        Console.WriteLine("Minecraft Directory found at \"{0}\"", minecraftDirectory);
+                        Console.WriteLine("Minecraft Directory found at \"{0}\"\n", minecraftDirectory);
                     else
                         throw new Exception("Minecraft Directory not found.");
 
@@ -64,11 +64,20 @@ namespace RGInstaller
                     }
 
                     if (forgeFound)
-                        Console.WriteLine("Forge found.");
+                        Console.WriteLine("Forge found.\n");
                     else
                     {
-                        Console.WriteLine("Please instal {0}", modpackInfo.ForgeVersion);
-                        Process.Start(modpackInfo.ForgeInstaller);
+                        Console.WriteLine("Please instal {0}\n", modpackInfo.ForgeVersion);
+                        ProcessStartInfo startInfo = new ProcessStartInfo
+                        {
+                            FileName = "cmd",
+                            Arguments = string.Format("/c start {0}", modpackInfo.ForgeInstaller),
+                            WindowStyle = ProcessWindowStyle.Hidden,
+                            CreateNoWindow = true,
+                            UseShellExecute = false
+                        };
+
+                        Process.Start(startInfo);
                     }
 
                     // Download the mods
@@ -88,7 +97,7 @@ namespace RGInstaller
                         }
                     }
 
-                    Console.WriteLine("Download Complete!");
+                    Console.WriteLine("\nDownload Complete!");
                 }
             }
             catch (WebException e)
