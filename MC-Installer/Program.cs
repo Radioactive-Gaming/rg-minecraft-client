@@ -10,7 +10,7 @@ namespace RGInstaller
 {
     class Program
     {
-        static readonly string SourceUri = "http://radzgaming.com/data/minecraft";
+        static readonly string SourceUri = "https://radzgaming.com/data/minecraft";
 
         static void Main(string[] args)
         {
@@ -77,7 +77,11 @@ namespace RGInstaller
                             UseShellExecute = false
                         };
 
-                        Process.Start(startInfo);
+                        using (Process proc = Process.Start(startInfo))
+                        {
+
+
+                        }
                     }
 
                     // Download the mods
